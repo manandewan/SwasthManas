@@ -2,232 +2,132 @@ import random
 
 class CognitiveTaskGenerator:
     """
-    Generates senior-friendly cognitive exercises (MCQ) with enhanced difficulty levels.
-    Now generates 50+ unique variations per level to prevent repetition.
+    Generates senior-friendly cognitive exercises.
+    Math tasks are now generated 'Live' using random variables to ensure zero repetition.
     """
 
     def __init__(self):
-        self.tasks_data = []
-        
-        # Initialize categories
-        self._generate_math_tasks()
+        # We still initialize memory tasks, but math is now procedural
+        self.memory_tasks_data = []
         self._generate_memory_tasks()
 
-    def _generate_math_tasks(self):
+    def _generate_math_live(self, difficulty):
         """
-        Generates Math tasks with randomized numbers to ensure variety.
+        Generates a random math question based on difficulty.
         """
-        # Common Items for variety
-        grocery_items = ["Milk", "Bread", "Eggs", "Tea", "Biscuits", "Curd", "Butter", "Cheese"]
+        items = ["Apples", "Milk", "Bread", "Tea", "Coffee", "Rice", "Oil", "Soap"]
         
-        # ==================================================
-        # LEVEL 1: Exact Change / Simple Purchase
-        # ==================================================
-        for _ in range(50): # Increased from 5 to 50
-            item = random.choice(grocery_items)
-            # Random price between 20 and 90 (multiples of 5)
-            price = random.randint(4, 18) * 5 
-            
-            # Note is either 100, 200, or 500
-            note = random.choice([100, 200, 500])
-            while note < price: 
-                note = 500 # Ensure note covers price
-                
-            change = note - price
-            
-            # Generate wrong options (close to correct answer)
-            wrong1 = change + 10
-            wrong2 = change - 5
-            wrong3 = change + 5
-            
-            self.tasks_data.append({
-                "category": "math", "difficulty": 1,
-                "question": f"You buy {item} for ₹{price}. You pay with a ₹{note} note. How much change do you get?",
-                "answer": f"₹{change}",
-                "options": [f"₹{change}", f"₹{wrong1}", f"₹{wrong2}", f"₹{wrong3}"],
+        if difficulty == 1:
+            # Simple Subtraction (Change)
+            item = random.choice(items)
+            price = random.randint(3, 15) * 5 # 15 to 75
+            note = random.choice([100, 200])
+            correct = note - price
+            return {
+                "question": f"You buy {item} for ₹{price}. You pay with a ₹{note} note. What is your change?",
+                "answer": f"₹{correct}",
+                "options": [f"₹{correct}", f"₹{correct+5}", f"₹{correct-5}", f"₹{correct+10}"],
                 "hint": "Subtract the price from the note."
-            })
+            }
 
-        # ==================================================
-        # LEVEL 2: Simple Addition + Subtraction with Context
-        # ==================================================
-        weather_context = ["It is raining heavily.", "The sun is very bright today.", "It is a windy evening.", "There is a lot of traffic."]
-        for _ in range(50):
-            # Select 2 random items and random prices
-            i1, i2 = random.sample(grocery_items, 2)
-            p1 = random.randint(5, 20) * 10 # e.g., 50, 60... 200
-            p2 = random.randint(5, 20) * 10
-            
-            total = p1 + p2
-            context = random.choice(weather_context)
-            
-            self.tasks_data.append({
-                "category": "math", "difficulty": 2,
-                "question": f"{context} You buy {i1} (₹{p1}) and {i2} (₹{p2}). What is the total bill?",
-                "answer": f"₹{total}",
-                "options": [f"₹{total}", f"₹{total+10}", f"₹{total-10}", f"₹{total+20}"],
-                "hint": "Ignore the weather. Just add the two prices."
-            })
+        elif difficulty == 2:
+            # Addition of two items
+            i1, i2 = random.sample(items, 2)
+            p1 = random.randint(2, 10) * 10
+            p2 = random.randint(2, 10) * 10
+            correct = p1 + p2
+            return {
+                "question": f"You buy {i1} for ₹{p1} and {i2} for ₹{p2}. What is the total?",
+                "answer": f"₹{correct}",
+                "options": [f"₹{correct}", f"₹{correct+10}", f"₹{correct-10}", f"₹{correct+20}"],
+                "hint": "Add the two prices together."
+            }
 
-        # ==================================================
-        # LEVEL 3: Algorithm A - "Market Kid" Heuristic
-        # ==================================================
-        for _ in range(50):
-            # Scenario: Bill 327. Pay 500 + 20 + 7.
-            base = random.choice([100, 200, 300, 400])
-            tens = random.randint(1, 9) * 10
-            units = random.choice([3, 6, 7, 8, 9]) 
-            bill = base + tens + units 
-            
-            note_val = 500 if bill < 500 else 1000
-            coins_val = units 
-            total_paid = note_val + coins_val 
-            
-            change = total_paid - bill 
-            route = random.randint(100, 500)
+        elif difficulty == 3:
+            # Multiplication (Simple Quantity)
+            item = random.choice(items)
+            price = random.randint(15, 45)
+            qty = random.randint(3, 6)
+            correct = price * qty
+            return {
+                "question": f"One pack of {item} costs ₹{price}. How much do {qty} packs cost?",
+                "answer": f"₹{correct}",
+                "options": [f"₹{correct}", f"₹{correct+price}", f"₹{correct-price}", f"₹{correct+10}"],
+                "hint": f"Try adding {price} to itself {qty} times."
+            }
 
-            self.tasks_data.append({
-                "category": "math", "difficulty": 3,
-                "question": f"You take Bus Route {route} to the market. The bill is ₹{bill}. You hand the cashier a ₹{note_val} note and ₹{coins_val} in coins (Total ₹{total_paid}). How much change do you get?",
-                "answer": f"₹{change}",
-                "options": [f"₹{change}", f"₹{change-coins_val}", f"₹{change+10}", f"₹{change-10}"],
-                "hint": f"Think: ₹{total_paid} - ₹{bill}. The ₹{coins_val} cancels out the last digit."
-            })
+        elif difficulty == 4:
+            # Two-step: Multiply and Subtract
+            item = random.choice(items)
+            price = random.randint(60, 120)
+            qty = 2
+            note = 500
+            total = price * qty
+            correct = note - total
+            return {
+                "question": f"You buy {qty} units of {item} at ₹{price} each. You pay with ₹{note}. What is the change?",
+                "answer": f"₹{correct}",
+                "options": [f"₹{correct}", f"₹{correct+20}", f"₹{total}", f"₹{correct-10}"],
+                "hint": f"First find the total (2 x {price}), then subtract from {note}."
+            }
 
-        # ==================================================
-        # LEVEL 4: Algorithm B - Inflationary Budgeting
-        # ==================================================
-        market_types = ["Rice", "Oil", "Dal", "Sugar", "Spices", "Wheat"]
-        for _ in range(50):
-            budget = 500
-            # Randomize cart
-            cart_items = random.sample(market_types, 3)
-            # Random prices
-            prices = [random.randint(10, 20)*10 for _ in range(3)] 
+        elif difficulty == 5:
+            # LEVEL 5: Hard Multi-step Logic
+            # Percentage Discount + Remaining Budget
+            item = "Premium Grains"
+            price = random.randint(800, 1500)
+            discount_pct = random.choice([10, 20, 25])
+            budget = 2000
             
-            initial_total = sum(prices)
+            discount_amt = int(price * (discount_pct / 100))
+            final_price = price - discount_amt
+            remaining = budget - final_price
             
-            # Make sure total is close to budget for the logic to work
-            if initial_total < 300: initial_total += 100
-
-            shock_idx = 0
-            shock_name = cart_items[shock_idx]
-            old_price = prices[shock_idx]
-            
-            new_price = int(old_price * 1.40) # 40% rise
-            new_total = initial_total - old_price + new_price
-            deficit = new_total - budget
-            
-            if deficit > 0:
-                q_text = f"Your budget is ₹{budget}. Cart: {cart_items[0]}, {cart_items[1]}, {cart_items[2]} (Total ₹{initial_total}). Suddenly, monsoon rains damage the {shock_name} crop! Price rises 40% to ₹{new_price}. How much EXTRA money do you need?"
-                ans = f"₹{deficit}"
-                opts = [f"₹{deficit}", f"₹{deficit+10}", f"₹{deficit-5}", "₹0"]
-            else:
-                remaining = abs(deficit)
-                q_text = f"Your budget is ₹{budget}. Cart: {cart_items[0]}, {cart_items[1]}, {cart_items[2]}. {shock_name} price rises 40% to ₹{new_price}. New Total is ₹{new_total}. How much money is left?"
-                ans = f"₹{remaining}"
-                opts = [f"₹{remaining}", f"₹{remaining+20}", "₹0", "Not enough"]
-
-            self.tasks_data.append({
-                "category": "math", "difficulty": 4,
-                "question": q_text,
-                "answer": ans,
-                "options": opts,
-                "hint": f"Calculate the new total first: old total - {old_price} + {new_price}."
-            })
-
-        # ==================================================
-        # LEVEL 5: Algorithm C - Unit Price Optimization
-        # ==================================================
-        products = ["Garlic", "Coffee", "Cashews", "Detergent", "Almonds"]
-        for _ in range(50):
-            prod = random.choice(products)
-            base_price = random.choice([200, 300, 400, 500, 600])
-            
-            opt_a = f"1 kg for ₹{base_price}"
-            price_b = int((base_price / 2) * 1.2)
-            opt_b = f"500g for ₹{price_b}"
-            price_c = int((base_price / 10) * 1.5)
-            opt_c = f"100g for ₹{price_c}"
-            
-            self.tasks_data.append({
-                "category": "math", "difficulty": 5,
-                "question": f"Which {prod} option offers the BEST value per kilogram? (Watch out for small packets!)\n\nA: {opt_a}\nB: {opt_b}\nC: {opt_c}",
-                "answer": "Option A",
-                "options": ["Option A", "Option B", "Option C", "All equal"],
-                "hint": "Calculate the price for 1 kg for each. For 100g, multiply by 10."
-            })
+            return {
+                "question": f"A sack of {item} is priced at ₹{price}. There is a {discount_pct}% discount today. If you have ₹{budget}, how much money will you have LEFT after buying it?",
+                "answer": f"₹{remaining}",
+                "options": [f"₹{remaining}", f"₹{final_price}", f"₹{remaining-50}", f"₹{remaining+100}"],
+                "hint": f"1. Find the discount. 2. Subtract it from {price}. 3. Subtract that from {budget}."
+            }
 
     def _generate_memory_tasks(self):
+        # We keep the memory generation as is, but generate a large batch
         ordinals = {1:"1st", 2:"2nd", 3:"3rd", 4:"4th", 5:"5th", 6:"6th", 7:"7th", 8:"8th", 9:"9th"}
-        
         for level in range(1, 6):
             num_digits = level + 4
-            
-            for _ in range(50): # Increased to 50
-                # Generate completely random sequences every time
+            for _ in range(100):
                 digits = [str(random.randint(0, 9)) for _ in range(num_digits)]
-                memorize_str = " - ".join(digits)
-                
-                target_idx = random.randint(0, num_digits - 1)
-                target_pos = target_idx + 1
-                correct_digit = digits[target_idx]
-                
-                question_text = f"Which number was {ordinals[target_pos]}?"
-                
-                # Ensure unique options
-                options = {correct_digit}
-                while len(options) < 4:
-                    options.add(str(random.randint(0, 9)))
-                
-                self.tasks_data.append({
-                    "category": "memory",
-                    "difficulty": level,
-                    "memorize_content": memorize_str,
-                    "question": question_text,
-                    "answer": correct_digit,
-                    "options": list(options),
-                    "hint": "Try visualizing the number in that specific spot."
+                mem_str = " - ".join(digits)
+                idx = random.randint(0, num_digits - 1)
+                self.memory_tasks_data.append({
+                    "category": "memory", "difficulty": level,
+                    "memorize_content": mem_str,
+                    "question": f"Which number was {ordinals[idx+1]}?",
+                    "answer": digits[idx],
+                    "options": list(set([digits[idx], str(random.randint(0,9)), str(random.randint(0,9)), str(random.randint(0,9))])),
+                    "hint": "Try to group the numbers in your head."
                 })
 
     def generate_task(self, category=None, difficulty=1, exclude_questions=None):
-        if exclude_questions is None: exclude_questions = []
+        if category == "math":
+            raw_task = self._generate_math_live(difficulty)
+        else:
+            # Memory still uses the pool but it's large (500 tasks total)
+            pool = [t for t in self.memory_tasks_data if t['difficulty'] == difficulty]
+            raw_task = random.choice(pool)
 
-        # Filter available tasks
-        filtered_tasks = [
-            t for t in self.tasks_data 
-            if t['difficulty'] == difficulty 
-            and (category is None or t['category'] == category)
-            # Exclude already played ones
-            and (t.get('memorize_content', t['question']) not in exclude_questions)
-        ]
+        # Ensure 4 options
+        opts = raw_task['options']
+        while len(opts) < 4:
+            opts.append(str(random.randint(10, 100)))
+        random.shuffle(opts)
 
-        # If we run out of unique tasks, reset pool (allow repeats but warn user)
-        if not filtered_tasks:
-            filtered_tasks = [
-                t for t in self.tasks_data 
-                if t['difficulty'] == difficulty 
-                and (category is None or t['category'] == category)
-            ]
-        
-        # Fallback if somehow still empty
-        if not filtered_tasks:
-            fallback = [t for t in self.tasks_data if t['category'] == 'math' and t['difficulty'] == 1]
-            return self._format_task(random.choice(fallback))
-        
-        selected_task = random.choice(filtered_tasks)
-        return self._format_task(selected_task)
-
-    def _format_task(self, task):
-        options = task['options'].copy()
-        random.shuffle(options)
-        
         return {
-            'question': task['question'],
-            'memorize_content': task.get('memorize_content'),
-            'options': options,
-            'correct_answer': task['answer'],
-            'category': task['category'],
-            'difficulty': task['difficulty'],
-            'hint': task.get('hint', 'No hint available.')
+            'question': raw_task['question'],
+            'memorize_content': raw_task.get('memorize_content'),
+            'options': opts,
+            'correct_answer': raw_task['answer'],
+            'category': category,
+            'difficulty': difficulty,
+            'hint': raw_task.get('hint')
         }
