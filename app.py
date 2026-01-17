@@ -221,7 +221,7 @@ if st.session_state.page == "onboarding":
         math_choice = st.radio("Math Comfort", ["Comfortable", "Not sure", "Not comfortable"], key="m_conf", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown("##### 2. How is your **Memory**?")
+        st.markdown("##### 2. How comfortable are you with your **Memory**?")
         mem_choice = st.radio("Memory Comfort", ["Comfortable", "Not sure", "Not comfortable"], key="mem_conf", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         
